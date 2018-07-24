@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL.h>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 
 
 void update();
@@ -11,12 +14,26 @@ void log_error(const char *fmt, ...) {
     vfprintf(stderr, fmt, valist);
 }
 
+// Main initialization
+lua_State * open_lua() {
+    lua_State * l = luaL_newstate();
+    luaL_openlibs(l);
+    return l;
+}
+
+// Cleaning Function
+void close_lua(lua_State *l) {
+    lua_close(l);
+}
+
 const char * AppTitle = "Example";
 const int ScreenWidth = 800;
 const int ScreenHeight = 600;
 
 int main(int argc, char ** argv) {
     
+    lua_State * Lua = open_lua();   // Main Lua State
+
     SDL_Window * _window = NULL;
     SDL_Renderer * _renderer = NULL;
     if (SDL_Init( SDL_INIT_VIDEO) < 0) {
@@ -74,6 +91,7 @@ int main(int argc, char ** argv) {
     _window = NULL;
     _renderer = NULL;
 
+    close_lua(Lua);
     SDL_Quit();
 
     return 0;
