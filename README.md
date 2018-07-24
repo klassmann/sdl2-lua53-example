@@ -8,7 +8,7 @@ I provide here an essential app in SDL 2 with events, input management, and expo
 
 ## Features
 - Cmake, see [Requirements](REQUIREMENTS.md)
-- [SDL 2](INSTALL_SDL2.md)
+- [SDL 2](INSTALL_SDL.md)
 - [Lua 5.3](INSTALL_LUA.md)
 
 ## Building the Project
