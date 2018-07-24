@@ -22,6 +22,11 @@ set(SOURCE_FILES
 	"src/main.c"
 )
 
+configure_file(
+	"src/settings.lua"
+	"settings.lua"
+)
+
 add_executable (${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME}
 	${SDL2_LIBRARY}
