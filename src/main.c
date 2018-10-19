@@ -43,21 +43,21 @@ SDL_Window * gWindow = NULL;
 SDL_Renderer * gRenderer = NULL;
 
 // API between Lua and SDL
-int api_drawline(lua_State *l) {
+int api_drawpoint(lua_State *l) {
 
     int x1 = luaL_checkinteger(l, 1);
     int y1 = luaL_checkinteger(l, 2);
-    int x2 = luaL_checkinteger(l, 3);
-    int y2 = luaL_checkinteger(l, 4);
 
-    SDL_RenderDrawLine(gRenderer, x1, y1, x2, y2);
+    // Set white as default color for rendering the lines
+    SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+    SDL_RenderDrawPoint(gRenderer, x1, y1);
 
     return 0;
 }
 
 void setup_api(lua_State *l) {
-    lua_pushcfunction(l, api_drawline);
-    lua_setglobal(l, "drawline");
+    lua_pushcfunction(l, api_drawpoint);
+    lua_setglobal(l, "drawpoint");
 }
 
 // Lua Routines
@@ -122,6 +122,7 @@ appsettings_t *load_configuration(const char *filename) {
     settings->Title = lua_getstring(l, "app_title");
     settings->ScreenWidth = lua_getint(l, "screen_width");
     settings->ScreenHeight = lua_getint(l, "screen_height");
+    settings->BackgroundColor = lua_getcolor(l, "background_color");
 
     lua_close(l);
 
@@ -133,7 +134,7 @@ lua_State *load_script(const char *filename) {
 
     setup_api(l);
 
-    if (luaL_loadfile(l, "example5.lua") == LUA_OK) {
+    if (luaL_loadfile(l, filename) == LUA_OK) {
         if (lua_pcall(l, 0, 1, 0) == LUA_OK) {
             lua_pop(l, lua_gettop(l));
         }
@@ -142,13 +143,13 @@ lua_State *load_script(const char *filename) {
     return l;
 }
 
-void run_method(lua_State *l, const char *method) {
+void run_method(lua_State *l, const char *method, uint arg) {
     lua_getglobal(l, method);
 
-    if (lua_isfunction(l, -1)) {
-        if (!(lua_pcall(l, 0, 0, 0) == LUA_OK)) {
-            log_error("Error on run method: %s\n", method);
-        }
+    lua_pushinteger(l, arg);
+
+    if (!(lua_pcall(l, 1, 0, 0) == LUA_OK)) {
+        log_error("Error on run method: %s\n", method);
     }
 }
 
@@ -158,11 +159,7 @@ int main(int argc, char ** argv) {
      // Loading settings from settings.lua
      gSettings = load_configuration(SettingsFile);
 
-    // fprintf(stderr, "Title: %s\n", gSettings->Title);
-    // fprintf(stderr, "Screen Width: %d\n", gSettings->ScreenWidth);
-    // fprintf(stderr, "Screen Height: %d\n", gSettings->ScreenHeight);
-
-    //  lua_State *mainScript = load_script(ScriptFile);
+     lua_State *mainScript = load_script(ScriptFile);
 
     if (SDL_Init( SDL_INIT_VIDEO) < 0) {
         log_error("Could not initialize SDL_Init: %s\n", SDL_GetError());
@@ -190,8 +187,10 @@ int main(int argc, char ** argv) {
 
     int quit = 0;
     SDL_Event e;
+    uint t = SDL_GetTicks();
 
     while (quit != 1) {
+
         // Events
         while(SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
@@ -212,7 +211,7 @@ int main(int argc, char ** argv) {
 
         // Render objects
         draw();
-        // run_method(mainScript, "draw");
+        run_method(mainScript, "draw", (SDL_GetTicks() - t) / 160 );
 
         // Update screen
         SDL_RenderPresent(gRenderer);
@@ -220,7 +219,7 @@ int main(int argc, char ** argv) {
 
     SDL_DestroyRenderer(gRenderer);
     SDL_DestroyWindow(gWindow);
-    // lua_close(mainScript);
+    lua_close(mainScript);
     free(gSettings);
 
     gWindow = NULL;
