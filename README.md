@@ -1,9 +1,11 @@
 # A Basic app skeleton composed by SDL2, Lua 5.3 and CMake
+
+**WIP - I'am working on documentation and some installation instructions**
+
 You can use it as a starting point for small projects. My intention here is to have an easy starting point for small projects that need graphics, easily extension with Lua and a portable build system like CMake.
 
 It is an essential app in SDL 2 with events, input management, and exposing some functions to Lua as an example.
 
-**I'am working on documentation and some installation instructions**
 
 ![Screenshot](screenshot.png)
 
