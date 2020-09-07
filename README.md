@@ -1,4 +1,4 @@
-# A Basic app skeleton composed by SDL2, Lua 5.3 and CMake
+# A Basic app skeleton with SDL2, Lua 5.3 and CMake
 
 **WIP - I'am working on documentation and some installation instructions**
 
@@ -51,4 +51,4 @@ open example.xcodeproj # The default name is "example" in CMakeLists.txt
 TODO.
 
 ## License
-[MIT](LICENSE).
+[Apache 2.0](LICENSE)
